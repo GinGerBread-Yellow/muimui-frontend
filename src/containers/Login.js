@@ -1,158 +1,3 @@
-import { useState, useEffect, useRef } from 'react'
-
-// import './Login.css'
-import { Navigate } from 'react-router-dom';
-
-/*
-const Login = ({id, login, history}) => {
-    // const [form] = Form.useForm();
-    // return <div>login page</div>
-
-    // ===== some hooks for validating username and password ==== 
-    // in Ant design, there are 3 status
-    // status: success, warning, error
-    // const history = useHistory();
-    const [status, setStatus] = useState(null);
-    const [userValid, setUsrVad] = useState(null);
-    const [psdValid, setPsdVad] = useState(null);
-    const [userMsg, setUsrMsg] = useState(null);
-    const [psdMsg, setPsdMsg] = useState(null);
-    
-    // ==== some ref =======
-    const userRef = useRef(null);
-    const psdRef = useRef(null);
-
-    // login as a normal user
-    const logInNormal = async ({user,password}) => { 
-        // console.log(user, password);      
-        if (checkUserName(user) && checkPassWord(password)) {
-            const result = await login({user,password});
-            if (result === 'success') {
-                // console.log("log in successfully, redirect to /");
-                history.push("/");
-            } else {
-                setStatus('user');
-                setUsrVad('error');
-                setPsdVad('error');
-                setUsrMsg(result);
-                // form.resetFields();
-                userRef.current.focus();
-            }
-        }
-    }
-    // return true if username is not empty
-    const checkUserName = (user) => {
-        if (!user) {
-            setStatus('user')
-            setUsrVad('error');
-            setUsrMsg('User name should not be blank!!');
-            userRef.current.focus(); 
-            return false;           
-        }
-        setUsrVad(null)
-        setUsrMsg(null)
-        return true;
-
-    }
-
-    const onSignUp = () => {
-        history.push("/register");
-    }
-    // return true if password is not empty
-    const checkPassWord = (password) => {
-        if (!password) {
-            if(status==='psd') {
-                setPsdVad('error')
-                setPsdMsg('Password  should not be blank!!')
-            } else {
-                setStatus('psd')
-                psdRef.current.focus();
-            }
-            return false;
-        }
-        setPsdVad(null)
-        setPsdMsg(null)
-        return true
-    }
-    // login as an Administrator
-
-    // useEffect(()=>{
-    //     if (userRef !== null && !id) { // && !id
-    //         userRef.current.focus();
-    //     }
-    // }, [id]);
-    
-    // render Container
-    // if (id) {
-    //     // approach 1
-    //     // console.log("has id, redirect to /")
-    //     return <Navigate to="/" />;
-    // }
-    
-    return(
-        <div className="loginContainer">
-            <div className="login-title">
-                <h1>MuiMui</h1>
-                <p> A system that helps you find cat </p>
-            </div>
-            <div className="login-main">
-                <form 
-                    form={form} 
-                    name="normallogin" 
-                    className="login-form"
-                    onFinish={logInNormal} 
-                    style={{marginTop: "10px"}}
-                >
-                    <div
-                        name="user"
-                        validateStatus={userValid}
-                        help={userMsg}
-                    >
-                        <Input 
-                            prefix={<UserOutlined className="site-form-item-icon" />} 
-                            placeholder="user"
-                            ref={userRef}
-                            onChange={(e)=>{
-                                checkUserName(e.target.value)
-                            }}
-                        />
-                    </div>
-                    <div
-                        name="password"
-                        validateStatus={psdValid}
-                        help={psdMsg}
-                    >
-                        <input
-                            prefix={<LockOutlined className="site-form-item-icon"/>} 
-                            placeholder="Password"
-                            iconRender={visible => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                            ref={psdRef} 
-                            onChange={(e)=>{
-                                checkPassWord(e.target.value)
-                            }}
-                        />
-                    </div>  
-                    <div >
-                        <span className="register"><a 
-                            onClick={onSignUp}
-                        >Sign up here</a></span>
-                        <button
-                            type="primary"
-                            htmlType="submit"
-                            className="login-submit"
-                        > Log in
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-        </div>
-    )
-    
-    // return <div> login yeah</div>
-
-}
-*/
 
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
@@ -169,33 +14,36 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-/** 
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-*/
+import {login, test} from '../axios/axios';
+import {useNavigate} from 'react-router-dom';
+import Copyright from '../components/Copyright';
 
 const theme = createTheme();
 
 function SignIn() {
-  const handleSubmit = (event) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     // eslint-disable-next-line no-console
-    console.log({
-      email: data.get('email'),
+    const myreq = {
+      username: data.get('userAccount'),
       password: data.get('password'),
-    });
+    };
+    console.log(myreq);
+    const res = await login(myreq);
+    if (res === 'success') {
+      navigate('/');
+    }
+
   };
+
+  const handleTest = async (e) => {
+    const res = await test();
+    console.log(res);
+    return;
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -216,7 +64,7 @@ function SignIn() {
             Sign in
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-            <TextField
+            {/* <TextField
               margin="normal"
               required
               fullWidth
@@ -225,6 +73,15 @@ function SignIn() {
               name="email"
               autoComplete="email"
               autoFocus
+            /> */}
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="userAccount"
+              label="Account"
+              name="userAccount"
+              autoComplete="name"
             />
             <TextField
               margin="normal"
@@ -248,6 +105,15 @@ function SignIn() {
             >
               Sign In
             </Button>
+            <Button
+              // type="Test"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              onClick={handleTest}
+            >
+              Test
+            </Button>
             <Grid container>
               {/* <Grid item xs>
                 <Link href="#" variant="body2">
@@ -262,7 +128,7 @@ function SignIn() {
             </Grid>
           </Box>
         </Box>
-        {/* <Copyright sx={{ mt: 8, mb: 4 }} /> */}
+        <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>
     </ThemeProvider>
   );

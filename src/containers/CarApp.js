@@ -25,7 +25,8 @@ import Deposits from '../components/Deposits';
 import Orders from '../components/Orders';
 import Copyright from '../components/Copyright';
 
-
+import { useNavigate } from 'react-router';
+import { getUserName, logout } from '../axios/axios';
 const drawerWidth = 240;
 
 const AppBar = styled(MuiAppBar, {
@@ -79,6 +80,16 @@ function DashboardContent() {
   const toggleDrawer = () => {
     setOpen(!open);
   };
+  const navigate = useNavigate();
+  if (!getUserName()) {
+      console.log("not login yet");
+      navigate('/login');
+  }
+
+  const userLogout = () => {
+      logout();
+      navigate('/login');
+  }
 
   return (
     <ThemeProvider theme={mdTheme}>
@@ -109,12 +120,32 @@ function DashboardContent() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Dashboard
+              Mui Mui 
             </Typography>
-            <IconButton color="inherit">
+            {/* <IconButton color="inherit">
               <Badge badgeContent={4} color="secondary">
                 <NotificationsIcon />
               </Badge>
+            </IconButton> */}
+            <Typography
+              component="h4"
+              variant="h6"
+              color="white"
+              noWrap
+            >
+                Hello {getUserName()}!
+            </Typography>
+            <IconButton>
+            <Typography
+              component="h4"
+              variant="h6"
+              color="white"
+              noWrap
+              onClick={userLogout}
+              // sx={{ flexGrow: 1 }}
+            >
+                log out
+            </Typography>
             </IconButton>
           </Toolbar>
         </AppBar>
@@ -188,6 +219,7 @@ function DashboardContent() {
           </Container>
         </Box>
       </Box>
+
     </ThemeProvider>
   );
 }
