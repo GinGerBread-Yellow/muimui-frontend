@@ -17,18 +17,22 @@ import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-
+import AppBar from '@mui/material/AppBar';
+import Button from '@mui/material/Button';
 
 import { mainListItems, secondaryListItems } from '../components/listItems';
 import Chart from '../components/Chart';
 import Deposits from '../components/Deposits';
 import Orders from '../components/Orders';
 import Copyright from '../components/Copyright';
+import CopyText from '../components/CopyText';
 
 import { useNavigate } from 'react-router';
 import { getUserName, logout } from '../axios/axios';
 const drawerWidth = 240;
 
+
+/** 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
@@ -46,6 +50,7 @@ const AppBar = styled(MuiAppBar, {
     }),
   }),
 }));
+*/
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
@@ -81,10 +86,10 @@ function DashboardContent() {
     setOpen(!open);
   };
   const navigate = useNavigate();
-  if (!getUserName()) {
-      console.log("not login yet");
-      navigate('/login');
-  }
+  // if (!getUserName()) {
+  //     console.log("not login yet");
+  //     navigate('/login');
+  // }
 
   const userLogout = () => {
       logout();
@@ -95,61 +100,51 @@ function DashboardContent() {
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <AppBar position="absolute" open={open}>
-          <Toolbar
+        <AppBar position="absolute" open={open} >
+        <Toolbar
+          sx={{
+            pr: '24px', // keep right padding when drawer closed
+          }}
+        >
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="open drawer"
+            onClick={toggleDrawer}
             sx={{
-              pr: '24px', // keep right padding when drawer closed
+              marginRight: '36px',
+              ...(open && { display: 'none' }),
             }}
           >
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              onClick={toggleDrawer}
-              sx={{
-                marginRight: '36px',
-                ...(open && { display: 'none' }),
-              }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              sx={{ flexGrow: 1 }}
-            >
-              Mui Mui 
-            </Typography>
-            {/* <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton> */}
-            <Typography
-              component="h4"
-              variant="h6"
-              color="white"
-              noWrap
-            >
-                Hello {getUserName()}!
-            </Typography>
-            <IconButton>
-            <Typography
-              component="h4"
-              variant="h6"
-              color="white"
-              noWrap
-              onClick={userLogout}
-              // sx={{ flexGrow: 1 }}
-            >
-                log out
-            </Typography>
-            </IconButton>
-          </Toolbar>
+            <MenuIcon />
+          </IconButton>
+          <Typography
+            component="h1"
+            variant="h6"
+            color="inherit"
+            noWrap
+            sx={{ flexGrow: 1 }}
+          >
+            Mui Mui 
+          </Typography>
+          {/* <IconButton color="inherit">
+            <Badge badgeContent={4} color="secondary">
+              <NotificationsIcon />
+            </Badge>
+          </IconButton> */}
+          <Typography
+            component="h4"
+            variant="h6"
+            color="white"
+            noWrap
+          >
+              Hello {getUserName()}!
+          </Typography>
+          
+          <Button color="inherit" onClick={userLogout}>Log out</Button>
+        </Toolbar>
         </AppBar>
-        <Drawer variant="permanent" open={open}>
+        {/* <Drawer variant="permanent" open={open}>
           <Toolbar
             sx={{
               display: 'flex',
@@ -166,7 +161,7 @@ function DashboardContent() {
           <List>{mainListItems}</List>
           <Divider />
           <List>{secondaryListItems}</List>
-        </Drawer>
+        </Drawer> */}
         <Box
           component="main"
           sx={{
@@ -183,6 +178,7 @@ function DashboardContent() {
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
               {/* Chart */}
+              
               <Grid item xs={12} md={8} lg={9}>
                 <Paper
                   sx={{
@@ -193,6 +189,7 @@ function DashboardContent() {
                   }}
                 >
                   {/* <Chart /> */}
+                  <CopyText text="Hello Worldekmfojoijoieno;;ojoij;olin;oine;onooiho;n;knjijoinoinooijoijoijo"/>
                 </Paper>
               </Grid>
               {/* Recent Deposits */}
