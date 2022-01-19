@@ -7,15 +7,15 @@ import Login from './containers/Login'
 // import UserInterface from './containers/UserInterface';
 // import SignUp from './containers/SignUp';
 // import {PrivateRoute} from './components/PrivateRoute';
-import { useAuth } from './Auth/AuthService';
 import CarApp from './containers/CarApp';
 import SignUp from './containers/SignUp';
+import { getUserName } from './axios/axios';
 
 function App() {
   const [isLoading, setLoading] = useState(false);
-  const {username, isAuth, login, logout, autoLogin} = useAuth();
+  // const {username, isAuth, login, logout, autoLogin} = useAuth();
   // useEffect(() => {
-  //   // do read cache here
+    // do read cache here
   //   setLoading(true)
   //   if (!username) {
   //     console.log("Welcome to Mui Mui");
@@ -36,8 +36,6 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<SignUp />} />
-          <Route
-            path="/user" element={<div>hello</div>} />
           <Route 
             path="/" element={<CarApp />} 
             />

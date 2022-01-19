@@ -6,10 +6,23 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from './Title';
+import { ButtonGroup, Button } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
 
 // Generate Order Data
 function createData(id, date, name, shipTo, paymentMethod, amount) {
   return { id, date, name, shipTo, paymentMethod, amount };
+}
+
+
+function changeStatus(st) {
+  if (st === 'm')
+    return 'maintainance';
+  else if (st === 'a')
+    return 'available';
+  else if (st === 'r')
+    return 'reserved';
+  return 'unknown';
 }
 
 const rows = [
@@ -48,39 +61,80 @@ const rows = [
   ),
 ];
 
+
 function preventDefault(event) {
   event.preventDefault();
 }
 
-export default function Orders() {
+export default function Orders({cars}) {
+  const [filterType, setFilterType] = React.useState('all');
+  const [filterCars, setFilterCars] = React.useState(cars);
+
+  function getFilter(s) {
+    if (s === 'all') {
+      function filterAll(e) {
+        return true;
+      }
+      return filterAll;
+    }
+    function filterStr(e) {
+      return e.status === s;
+    }
+    return filterStr;
+  }
+
+  React.useEffect(()=>{
+    setFilterCars(cars.filter(getFilter(filterType)));
+  }, [filterType]);
+
+  React.useEffect(()=>{
+    setFilterCars(cars.filter(getFilter(filterType)));
+  }, [cars]);
+
   return (
     <React.Fragment>
       <Title>Available Cars</Title>
+      <ButtonGroup
+        variant="outlined" aria-label="outlined button group"
+      >
+        <Button 
+          variant={filterType==='all'? 'contained':'outlined' }
+          onClick={()=>{setFilterType('all')}}
+          >All</Button>
+        <Button
+          variant={filterType==='a'? 'contained':'outlined' }
+          onClick={()=>{setFilterType('a')}}
+          >Avail Only</Button>
+
+      </ButtonGroup>
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Date</TableCell>
             <TableCell>Name</TableCell>
-            <TableCell>Ship To</TableCell>
-            <TableCell>Payment Method</TableCell>
-            <TableCell align="right">Sale Amount</TableCell>
+            <TableCell>Status</TableCell>
+            {/* <TableCell>Payment Method</TableCell>
+            <TableCell align="right">Sale Amount</TableCell> */}
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell>{row.date}</TableCell>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.shipTo}</TableCell>
-              <TableCell>{row.paymentMethod}</TableCell>
-              <TableCell align="right">{`$${row.amount}`}</TableCell>
+          {(filterCars.length === 0)? 
+              <p> No Cars here </p>
+            : <></>
+          }
+          {filterCars.map((row) => (
+            <TableRow key={row.carID}>
+              <TableCell>{row.type}</TableCell>
+              <TableCell>{changeStatus(row.status)}</TableCell>
+              {/* <TableCell>{row.shipTo}</TableCell> */}
+              {/* <TableCell>{crow.paymentMethod}</TableCell>
+              <TableCell align="right">{`$${row.amount}`}</TableCell> */}
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      <Link color="primary" href="#" onClick={preventDefault} sx={{ mt: 3 }}>
+      {/* <Link color="primary" href="#" onClick={preventDefault} sx={{ mt: 3 }}>
         See more orders
-      </Link>
+      </Link> */}
     </React.Fragment>
   );
 }

@@ -19,6 +19,9 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
+import LogoutIcon from '@mui/icons-material/Logout';
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 import { mainListItems, secondaryListItems } from '../components/listItems';
 import Chart from '../components/Chart';
@@ -26,9 +29,14 @@ import Deposits from '../components/Deposits';
 import Orders from '../components/Orders';
 import Copyright from '../components/Copyright';
 import CopyText from '../components/CopyText';
+import Snackbar from '@mui/material/Snackbar';
+import { Alert } from '@mui/material';
+
 
 import { useNavigate } from 'react-router';
-import { getUserName, logout } from '../axios/axios';
+import { axiosGetCars, axiosBookCar, getUserName, logout } from '../axios/axios';
+import CarForm from '../components/CarForm';
+import Title from '../components/Title';
 const drawerWidth = 240;
 
 
@@ -51,6 +59,20 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 */
+
+const myrows = [
+  create("03392", "Jetson Nano", "m"),
+  create("30224", "mui mui", "a"),
+  create("49492", "Jetson Nano3", "a"),
+  create("49494", "Jetson Nano2", "m"),
+  create("22034", "Jetson Nano4", "r"),
+];
+
+
+function create(id, type, st) {
+  return {carID:id, type:type, status:st};
+}
+
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
@@ -78,29 +100,114 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-const mdTheme = createTheme();
+const mdTheme = createTheme({
+  palette: {
+    primary: {
+      light: '#757ce8',
+      main: '#3f50b5',
+      dark: '#002884',
+      contrastText: '#fff',
+    },
+    secondary: {
+      light: '#ff7961',
+      main: '#f44336',
+      dark: '#ba000d',
+      contrastText: '#000',
+    },
+  },
+});
 
 function DashboardContent() {
   const [open, setOpen] = React.useState(true);
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
+  const [username, setUsername] = React.useState(null);
+  const [cars, setCars] = React.useState([]);
+  const [alertMsg, setAlert] = React.useState({status:"", message:""});
+  const [loading, setLoading] = React.useState(false);
+  const [text, setText] = React.useState("");
+
+  
   const navigate = useNavigate();
-  // if (!getUserName()) {
-  //     console.log("not login yet");
-  //     navigate('/login');
-  // }
+
+  const bookCar = async (carID, duration) => {
+    /**
+     * carID: string, 
+     * duration: int(in second)
+    */
+    // open effect
+    setLoading(true);
+    
+    const {status, data} = await axiosBookCar({carID, duration});
+    setLoading(false);
+    if (status === 'success') {
+      // data = sdp
+      setText(data);
+      console.log(data);
+    } else  {
+      console.log(data);
+      handleException(data);
+    }
+
+    return;
+
+  }
+
+  const handleException = (e) => {
+    console.log("err", e)
+    if (e.code === 'token_not_valid') {
+      setAlert({status: "error", message: "Please Login Again!"});
+      console.log("log out");
+      userLogout();
+    }
+  }
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAlert({status:"", message:""});
+  };
+
+  const getCars = async () => {
+    const {status, data} = await axiosGetCars();
+    if (status === 'success') {
+      setCars(data);
+    } else if (status === 'error') {
+      handleException(data);
+    } else {
+      setCars([]);
+    }
+
+  }
 
   const userLogout = () => {
+      setUsername(null);
       logout();
       navigate('/login');
   }
+
+  React.useEffect( async ()=> {
+    let name = getUserName();
+    if (!name) {
+      console.log("not login");
+      setAlert({status: "info", message: "Login first!"})
+      navigate('/login');
+    }
+    setUsername(name)
+    // ask avail car here
+    // await getCars();
+    setCars(myrows);
+  },[])
+
+  // React.useEffect( ()=> {
+  //   console.log(alertMsg);
+  // }, [alertMsg]);
 
   return (
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <AppBar position="absolute" open={open} >
+        <AppBar position="absolute" color='primary' open={open} >
         <Toolbar
           sx={{
             pr: '24px', // keep right padding when drawer closed
@@ -110,7 +217,7 @@ function DashboardContent() {
             edge="start"
             color="inherit"
             aria-label="open drawer"
-            onClick={toggleDrawer}
+            // onClick={toggleDrawer}
             sx={{
               marginRight: '36px',
               ...(open && { display: 'none' }),
@@ -125,43 +232,27 @@ function DashboardContent() {
             noWrap
             sx={{ flexGrow: 1 }}
           >
-            Mui Mui 
+            Mui Mui Reservation System
           </Typography>
-          {/* <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton> */}
+          
           <Typography
             component="h4"
             variant="h6"
             color="white"
             noWrap
+            sx= {{mr: 3,}}
           >
-              Hello {getUserName()}!
+              {username? username: "Anonymous"}
           </Typography>
-          
-          <Button color="inherit" onClick={userLogout}>Log out</Button>
+          <IconButton 
+            color="inherit"
+            onClick={userLogout}
+          >
+            <LogoutIcon />
+          </IconButton>
         </Toolbar>
         </AppBar>
-        {/* <Drawer variant="permanent" open={open}>
-          <Toolbar
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              px: [1],
-            }}
-          >
-            <IconButton onClick={toggleDrawer}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </Toolbar>
-          <Divider />
-          <List>{mainListItems}</List>
-          <Divider />
-          <List>{secondaryListItems}</List>
-        </Drawer> */}
+
         <Box
           component="main"
           sx={{
@@ -176,20 +267,41 @@ function DashboardContent() {
         >
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3}>
-              {/* Chart */}
-              
+            <Grid container spacing={3}> 
+              { text.length>0 && ( 
+                <Grid item xs={12} >
+                  <Paper
+                    sx={{
+                      p: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      // height: 240,
+                    }}
+                  >
+                    <Title>
+                      Your token
+                    </Title>
+                    {loading && (
+                      <CircularProgress color='inherit' />
+                    )}
+                    <CopyText text={text} />
+                  </Paper>
+                </Grid>
+              )}
               <Grid item xs={12} md={8} lg={9}>
                 <Paper
                   sx={{
                     p: 2,
                     display: 'flex',
                     flexDirection: 'column',
-                    height: 240,
+                    // height: 240,
                   }}
                 >
-                  {/* <Chart /> */}
-                  <CopyText text="Hello Worldekmfojoijoieno;;ojoij;olin;oine;onooiho;n;knjijoinoinooijoijoijo"/>
+                  
+                  <Orders 
+                    cars={cars}
+                  />
+                  {/* <CopyText text="Hello Worldekmfojoijoieno;;ojoij;olin;oine;onooiho;n;knjijoinoinooijoijoijo"/> */}
                 </Paper>
               </Grid>
               {/* Recent Deposits */}
@@ -199,23 +311,31 @@ function DashboardContent() {
                     p: 2,
                     display: 'flex',
                     flexDirection: 'column',
-                    height: 240,
+                    // height: 240,
                   }}
                 >
-                  <Deposits />
+                  <CarForm cars={cars} onSubmit={bookCar}/>
+                  {/* <Deposits /> */}
                 </Paper>
               </Grid>
               {/* Recent Orders */}
-              <Grid item xs={12}>
+              {/* <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Orders />
+                  I don't know
                 </Paper>
-              </Grid>
+              </Grid> */}
             </Grid>
             <Copyright sx={{ pt: 4 }} />
           </Container>
         </Box>
       </Box>
+      
+      <Snackbar open={alertMsg.status !== ""} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity={alertMsg.status || "success"} sx={{ width: '100%' }}>
+          {alertMsg.message}
+        </Alert>
+      </Snackbar>
+      
 
     </ThemeProvider>
   );

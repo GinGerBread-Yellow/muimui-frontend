@@ -15,21 +15,21 @@ const setToken = (token) => {
 }
 
 const setUserName = (name) => {
-  cookies.set('username', name, {
-      path: '/',
-      // secure: true, // 只能在https傳cookie
-      sameSite: true, // 禁止跨站傳cookie
-      // httpOnly: true, // 禁止透過script操作cookie
-  });
-  // console.log(cookies.get('token'));
+    cookies.set('username', name, {
+        path: '/',
+        // secure: true, // 只能在https傳cookie
+        sameSite: true, // 禁止跨站傳cookie
+        // httpOnly: true, // 禁止透過script操作cookie
+    });
+    // console.log(cookies.get('token'));
 }
 
 export const getUserName = () => {
-  if (cookies.get('username') === undefined) {
-    console.log("name not stored");
-    return null;
-  }
-  return cookies.get('username');
+    if (cookies.get('username') === undefined) {
+        console.log("name not stored");
+        return null;
+    }
+    return cookies.get('username');
 }
 
 const setJWTToken = ({access, refresh}) => {
@@ -58,157 +58,91 @@ const setJWTToken = ({access, refresh}) => {
 
 const getAuthToken = () => {
     if (cookies.get('access') === undefined) {
-        console.log("token not stored");
+        // console.log("token not stored");
         return '';
     }
     return cookies.get('access');
 }
 
 // import {useState} from 'react'
-console.log('NODE_ENV',process.env.NODE_ENV)
+// console.log('NODE_ENV',process.env.NODE_ENV)
 // const API_ROOT = (process.env.NODE_ENV==='production')?'/api':'http://localhost:4000'
-const API_ROOT = 'https://localhost:8000'
+const API_ROOT = 'http://localhost:8000'
 const instance = axios.create({
-  baseURL: API_ROOT,
-  // withCredentials: true
-  headers: { 'Content-Type': 'application/json',},
+    baseURL: API_ROOT,
+    // withCredentials: true
+    headers: { 'Content-Type': 'application/json',},
 })
 
 instance.interceptors.request.use(function (config) {
-  const token = getAuthToken();
-  config.headers.Authorization =  token ? `Bearer ${token}` : '';
-  return config;
+    const token = getAuthToken();
+    config.headers.Authorization =  token ? `Bearer ${token}` : '';
+    return config;
 });
 
 
-const dbCatch = e=>console.log('myError:',e?.response?.data?.msg)
+const dbCatch = e=>{
+    let err = e?.response?.data;
+    console.log('myError:',e?.response?.data);
+    return e?.response?.data;
+}
 
 // spring boot
 export const login = async (req)=> {
-  try {
-    const res = await instance.post("/api/token/", req);
-    console.log(res);
-    if (res.status===200 && res.data) {
-      // setToken(res.data.access);
-        setUserName(req.username);
-        setJWTToken(res.data);
+    try {
+        const res = await instance.post("/api/token/", req);
+        if (res.status===200 && res.data) {
+        // setToken(res.data.access);
+            setUserName(req.username);
+            setJWTToken(res.data);
+        }
+        return {status:"success", message: "login successfully"};
+    } catch (e) {
+        const {message} = dbCatch(e);
+        return {status: "error" , message};
     }
-    return "success";
-  } catch (e) {
-    console.log(e);
-    return "error";
-  }
 }
 
 export const test = async ()=> {
-  console.log(cookies.getAll());
-  try {
-    console.log(getAuthToken())
-    const res = await instance.get('rest/cars'); // "/api/v1/user"
-    return res.data;
-  } catch(e) {
-    console.log(e);
-    return null;
-  }
+    console.log(cookies.getAll());
+    try {
+        console.log(getAuthToken())
+        const res = await instance.get('rest/cars'); // "/api/v1/user"
+        return res.data;
+    } catch(e) {
+        return dbCatch(e)
+    }
 }
 
 export const logout = async () => {
-  // remove jwt
-  cookies.remove("username");
-  cookies.remove("access");
-  cookies.remove("refresh");
+    // remove jwt
+    cookies.remove("username");
+    cookies.remove("access");
+    cookies.remove("refresh");
 }
 
 // =========== login post ============
 
 
-export const loginAsNormalUser = async ({user,password}) => {
-    try {
-        return await instance.post('/login',{user, password});
-    } catch (e){
-        throw e;
-    }
-    
-}
-
-export const loginAsAuth = async () => {
-    try {
-        return await instance.post('/loginAuth');
-    } catch (e) {
-        // console.log("login auth fail");
-        throw e;
-    }
-    
-}
-
-export const addAuth = async (user,isAuth) => {
-    try {
-        const {data} = await instance.post('/addAuth', {params: {user,isAuth}});
-        return {user:data.user, isAuth: isAuth};
-    } catch (err) {
-        return null;
-    }
-}
-
-export const logoutUser = async () => {
-    await instance.post('/logout')
-        .catch((err) => {
-            throw err;
-        })
-}
-
-export const logoutAuth = async () => {
-    instance.post('/logoutAuth')
-        .catch((err) => {
-            throw err;
-        })
-}
-
-export const registerUser = async ({user,password}) => {
-    try {
-        const {data: {user: name}} = await instance.post('/register', {user,password});
-        return name;
-    } catch (e) {
-        // console.log("fail to register");
-        throw e;
-    }
-}
-
-// ============ houses =============
-export const sendHouseInformation = async(lat, lng, buildingType, floor, age) => {
-    try {
-        const {data: {similar, avgPrice}} = await instance.post('/valuate', {lat, lng, buildingType, floor, age})
-        return {similar, avgPrice}
-    } catch(err)  {
-        // console.log("fail to send houseImformation")
-        return null;
-    }
-}
-export const axiosGetHouses = async (params) => {
-    try {        
-        // console.log("get houses", params)
-        const {data:req_houses} = await instance.get('/houses',{params});
-        return req_houses;
-    } catch (e) {
-        // console.log("fail to get houses")
-        return null;
-    }
-    
-}
 export const axiosGetCars = async (params) => {
     try {
-        const {data:req_cars} = await instance.get('/cars', {params});
-        return req_cars;
+        const {data} = await instance.get('/rest/clients', {params});
+        return {status: "success", data};
     } catch (e) {
-        return null;
+        return {status: "error", data:[]};
     }
 }
-export const axiosPostCars = async (params) => {
+
+export const axiosBookCar = async (params) => {
     try {
-        const {data:req_cars} = await instance.post('/cars', {params});
-        return req_cars;
+        // console.log(params);
+        // const {data} = await instance.get('/rest/clients/'+carID, req);
+        const {data} = await instance.post('/rest/tutorial/', params);
+        const {status, sdp} = data;
+        return {status, data:sdp};
     } catch (e) {
-        return null;
+        const msg = dbCatch(e);
+        return {"status": "error", data: msg};
     }
 }
 

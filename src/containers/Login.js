@@ -17,11 +17,28 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {login, test} from '../axios/axios';
 import {useNavigate} from 'react-router-dom';
 import Copyright from '../components/Copyright';
+import { FormHelperText } from '@mui/material';
 
-const theme = createTheme();
+const theme = createTheme({
+  palette: {
+    primary: {
+      light: '#757ce8',
+      main: '#3f50b5',
+      dark: '#002884',
+      contrastText: '#fff',
+    },
+    secondary: {
+      light: '#ff7961',
+      main: '#f44336',
+      dark: '#ba000d',
+      contrastText: '#000',
+    },
+  },
+});
 
 function SignIn() {
   const navigate = useNavigate();
+  const [errMsg, setErrMsg] = React.useState(null);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -31,10 +48,11 @@ function SignIn() {
       username: data.get('userAccount'),
       password: data.get('password'),
     };
-    console.log(myreq);
-    const res = await login(myreq);
-    if (res === 'success') {
+    const {status, message} = await login(myreq);
+    if (status === 'success') {
       navigate('/');
+    } else {
+      setErrMsg(message);
     }
 
   };
@@ -82,6 +100,7 @@ function SignIn() {
               label="Account"
               name="userAccount"
               autoComplete="name"
+              error={errMsg? true:false}
             />
             <TextField
               margin="normal"
@@ -92,7 +111,9 @@ function SignIn() {
               type="password"
               id="password"
               autoComplete="current-password"
+              error={errMsg? true:false}
             />
+            <FormHelperText error id="component-error-text">{errMsg}</FormHelperText>
             {/* <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
@@ -105,15 +126,7 @@ function SignIn() {
             >
               Sign In
             </Button>
-            <Button
-              // type="Test"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              onClick={handleTest}
-            >
-              Test
-            </Button>
+
             <Grid container>
               {/* <Grid item xs>
                 <Link href="#" variant="body2">
@@ -121,9 +134,9 @@ function SignIn() {
                 </Link>
               </Grid> */}
               <Grid item>
-                <Link href="/register" variant="body2">
+                {/* <Link href="/register" variant="body2">
                   {"Don't have an account? Sign Up"}
-                </Link>
+                </Link> */}
               </Grid>
             </Grid>
           </Box>
