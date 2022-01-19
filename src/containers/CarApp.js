@@ -191,7 +191,7 @@ function DashboardContent() {
     if (!name) {
       console.log("not login");
       setAlert({status: "info", message: "Login first!"})
-      navigate('/login');
+      userLogout();
     }
     setUsername(name)
     // ask avail car here

@@ -138,8 +138,8 @@ export const axiosBookCar = async (params) => {
         // console.log(params);
         // const {data} = await instance.get('/rest/clients/'+carID, req);
         const {data} = await instance.post('/rest/tutorial/', params);
-        const {status, sdp} = data;
-        return {status, data:sdp};
+        const {status, token} = data;
+        return {status, data:token};
     } catch (e) {
         const msg = dbCatch(e);
         return {"status": "error", data: msg};
