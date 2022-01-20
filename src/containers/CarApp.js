@@ -70,7 +70,7 @@ const myrows = [
 
 
 function create(id, type, st) {
-  return {carID:id, type:type, status:st};
+  return {carID:id, carType:type, status:st};
 }
 
 
@@ -138,25 +138,25 @@ function DashboardContent() {
     
     const {status, data} = await axiosBookCar({carID, duration});
     setLoading(false);
-    if (status === 'success') {
+    if (status === 200) {
       // data = sdp
       setText(data);
-      console.log(data);
     } else  {
-      console.log(data);
-      handleException(data);
+      handleException(status, data);
     }
 
     return;
 
   }
 
-  const handleException = (e) => {
-    console.log("err", e)
-    if (e.code === 'token_not_valid') {
+  const handleException = (status, data) => {
+    console.log("err", status, data)
+    if (status === 401) {
       setAlert({status: "error", message: "Please Login Again!"});
-      console.log("log out");
+      // console.log("log out");
       userLogout();
+    } else if (status >= 500)  {
+      setAlert({status: "error", message: "server Error -"+data?.message});
     }
   }
 
@@ -169,12 +169,13 @@ function DashboardContent() {
   };
 
   const getCars = async () => {
-    const {status, data} = await axiosGetCars();
-    if (status === 'success') {
+    const res = await axiosGetCars();
+    // console.log(res);
+    let {status, data}  = res;
+    if (status === 200) {
       setCars(data);
-    } else if (status === 'error') {
-      handleException(data);
     } else {
+      handleException(status, data);
       setCars([]);
     }
 
@@ -189,14 +190,14 @@ function DashboardContent() {
   React.useEffect( async ()=> {
     let name = getUserName();
     if (!name) {
-      console.log("not login");
-      setAlert({status: "info", message: "Login first!"})
-      userLogout();
+      // console.log("not login");
+      // setAlert({status: "info", message: "Login first!"})
+      // userLogout();
     }
     setUsername(name)
     // ask avail car here
-    // await getCars();
-    setCars(myrows);
+    await getCars();
+    // setCars(myrows);
   },[])
 
   // React.useEffect( ()=> {

@@ -42,17 +42,17 @@ function SignIn() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    const send_data = new FormData(event.currentTarget);
     // eslint-disable-next-line no-console
     const myreq = {
-      username: data.get('userAccount'),
-      password: data.get('password'),
+      username: send_data.get('userAccount'),
+      password: send_data.get('password'),
     };
-    const {status, message} = await login(myreq);
-    if (status === 'success') {
+    const {status, data} = await login(myreq);
+    if (status === 200) {
       navigate('/');
     } else {
-      setErrMsg(message);
+      setErrMsg(data?.message);
     }
 
   };

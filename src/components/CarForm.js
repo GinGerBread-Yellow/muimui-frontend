@@ -84,7 +84,7 @@ export default function CarForm({cars, onSubmit}) {
           {availCars.map((car) => 
               <MenuItem 
                 key={car.carID}
-                value={car.carID}>{car.type}</MenuItem>
+                value={car.carID}>{car.carType}</MenuItem>
           )}
 
         </Select>
