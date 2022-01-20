@@ -17,7 +17,7 @@ import { FormHelperText } from '@mui/material';
 
 export default function CarForm({cars, onSubmit}) {
   const [carID, setCarID] = React.useState("");
-  const [duration, setDuration] = React.useState(new Date(2013, 2, 1, 0, 10,0));
+  const [duration, setDuration] = React.useState(new Date(2013, 2, 1, 0, 0,20));
   const [availCars, setAvailCars] = React.useState([]);
   const [errMsg, setErrMsg] = React.useState("");
 
