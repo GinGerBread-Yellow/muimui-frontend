@@ -22,6 +22,8 @@ function changeStatus(st) {
     return 'available';
   else if (st === 'r')
     return 'reserved';
+  else if (st === 'o')
+    return 'occupied';
   return 'unknown';
 }
 

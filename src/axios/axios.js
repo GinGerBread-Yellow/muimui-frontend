@@ -57,10 +57,7 @@ const getAuthToken = () => {
     return cookies.get('access');
 }
 
-// import {useState} from 'react'
-// console.log('NODE_ENV',process.env.NODE_ENV)
-// const API_ROOT = (process.env.NODE_ENV==='production')?'/api':'http://localhost:4000'
-const API_ROOT =  'http://localhost:8000' // 'http://192.168.137.97:8000' //
+const API_ROOT =  process.env.REACT_APP_BASE_URL;  
 const instance = axios.create({
     baseURL: API_ROOT,
     // withCredentials: true
@@ -76,8 +73,6 @@ instance.interceptors.request.use(function (config) {
 
 const dbCatch = e=>{
     let err = e?.response?.data;
-    // console.log(e?.response?.status)
-    // console.log('myError:',e?.response?.data);
     return {"status": e?.response?.status, "data": err};
 }
 
