@@ -155,7 +155,10 @@ function DashboardContent() {
       setAlert({status: "error", message: "Please Login Again!"});
       // console.log("log out");
       userLogout();
-    } else if (status >= 500)  {
+    } else if (status === 400) {
+      setAlert({status: "error", message: data.message});
+    } 
+    else if (status >= 500)  {
       setAlert({status: "error", message: "server Error -"+data?.message});
     }
   }
@@ -191,8 +194,8 @@ function DashboardContent() {
     let name = getUserName();
     if (!name) {
       // console.log("not login");
-      // setAlert({status: "info", message: "Login first!"})
-      // userLogout();
+      setAlert({status: "info", message: "Login first!"})
+      userLogout();
     }
     setUsername(name)
     // ask avail car here
@@ -268,7 +271,10 @@ function DashboardContent() {
         >
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3}> 
+            <Grid container spacing={3}>
+              {loading && (
+                <CircularProgress color='inherit' />
+              )} 
               { text.length>0 && ( 
                 <Grid item xs={12} >
                   <Paper
@@ -282,9 +288,9 @@ function DashboardContent() {
                     <Title>
                       Your token
                     </Title>
-                    {loading && (
-                      <CircularProgress color='inherit' />
-                    )}
+                    <Typography color="text.secondary" sx={{ flex: 1 }}>
+                      This token will expire in 30 seconds.
+                    </Typography>
                     <CopyText text={text} />
                   </Paper>
                 </Grid>

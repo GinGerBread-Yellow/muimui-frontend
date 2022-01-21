@@ -4,9 +4,16 @@
 #create .env file on the root directory
 REACT_APP_BASE_URL=<Your backend server root>
 ```
-
-- to run
+- to install dependencies
 ```bash
-yarn install
+yarn install-all
+```
+- to run in dev mode
+```bash
 yarn start
+```
+- to run in production mode
+```bash
+yarn build
+yarn start-build
 ```

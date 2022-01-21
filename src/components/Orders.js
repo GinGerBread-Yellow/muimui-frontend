@@ -125,7 +125,7 @@ export default function Orders({cars}) {
           }
           {filterCars.map((row) => (
             <TableRow key={row.carID}>
-              <TableCell>{row.carType}</TableCell>
+              <TableCell>{row.carType +row.carID}</TableCell>
               <TableCell>{changeStatus(row.status)}</TableCell>
               {/* <TableCell>{row.shipTo}</TableCell> */}
               {/* <TableCell>{crow.paymentMethod}</TableCell>
