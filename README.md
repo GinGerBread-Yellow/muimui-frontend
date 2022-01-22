@@ -12,8 +12,3 @@ yarn install-all
 ```bash
 yarn start
 ```
-- to run in production mode
-```bash
-yarn build
-yarn start-build
-```

@@ -57,7 +57,7 @@ const getAuthToken = () => {
     return cookies.get('access');
 }
 
-const API_ROOT =  process.env.REACT_APP_BASE_URL || "192.168.137.97:8000";  
+const API_ROOT =  process.env.REACT_APP_BASE_URL || "localhost:8000";  
 const instance = axios.create({
     baseURL: API_ROOT,
     // withCredentials: true
